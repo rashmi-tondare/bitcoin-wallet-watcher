@@ -1,13 +1,12 @@
 # frozen_string_literal: true
 
 class WalletInfoController < ApplicationController
-
   def get
     service = WalletInfoService.new(wallet_address)
     if service.info
       @result = service.result
     else
-      @error = service.error
+      flash.now[:danger] = service.error
     end
   end
 

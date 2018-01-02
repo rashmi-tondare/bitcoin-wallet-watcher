@@ -1,6 +1,10 @@
 @import "bootstrap-sprockets";
 @import "bootstrap";
 
+html,body {
+    height: 100%
+}
+
 .jumbotron {
   background-color: #021b3f;
   color: #fff;
@@ -20,5 +24,14 @@ th {
 }
 
 .vertical-mid {
-  vertical-align: middle !important
+  vertical-align: middle !important;
+}
+
+.footer {
+  width: 100%;
+  text-align: center;
+  margin-top: 45px;
+  padding-top: 5px;
+  border-top: 1px solid #eaeaea;
+  color: #777777;
 }

@@ -1,11 +1,11 @@
 <div class="jumbotron text-center">
-  <h1>Bitcoin Wallet Watcher</h1>
+  <h1>₿itcoin Wallet Watcher</h1>
   <p>Track wallet balances and transactions</p>
   <%= form_tag wallet_info_path, method: "get", class: "form-inline" do %>
     <div class="input-group">
       <%= text_field_tag :address, params[:address], class: "form-control", placeholder: "Wallet Address", size: 50 %>
       <div class="input-group-btn">
-        <%= submit_tag "Search", class: "btn btn-primary" %>
+        <%= submit_tag "Go", class: "btn btn-primary" %>
       </div>
     </div>
   <% end %>

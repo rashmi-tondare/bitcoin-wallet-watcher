@@ -10,8 +10,6 @@ class WalletInfoService < ApplicationService
       set_result
   end
 
-  def transactions; end
-
   private
 
   attr_reader :wallet_address
@@ -29,33 +27,37 @@ class WalletInfoService < ApplicationService
   end
 
   def set_result
-    @result = OpenStruct.new(balance: get_bitcoin(@resp_body[:final_balance]), transactions: get_transactions)
+    @result = {
+      balance:      get_bitcoin(@resp_body[:final_balance]),
+      transactions: transactions
+    }
   end
 
   def get_bitcoin(satoshis)
-    btc = satoshis.to_f/100000000
-    return 0 if btc == 0
-    "%.8f" % btc
+    btc = satoshis.to_f / 100_000_000
+    btc.zero? ? 0 : "%.8f" % btc
   end
 
-  def get_transactions
+  # rubocop:disable Metrics/AbcSize
+  def transactions
     return [] if @resp_body[:txs]&.empty?
     transactions = []
     @resp_body[:txs].each do |txn|
       transaction = {}
-      inputs = txn[:inputs].map { |input| input[:prev_out][:addr] }
-      outputs = txn[:out].map { |out| out[:addr]}
+      inputs = txn[:inputs].map {|input| input[:prev_out][:addr] }
+      outputs = txn[:out].map {|out| out[:addr] }
       is_credit = wallet_address.in?(outputs)
 
       transaction[:senders] = is_credit ? inputs : [wallet_address]
       transaction[:receivers] = is_credit ? [wallet_address] : outputs
-      values = is_credit ? txn[:inputs].map { |input| input[:prev_out][:value] } : txn[:out].map { |out| out[:value]}
-      transaction[:values] = values.map { |value| get_bitcoin(value)}
+      values = is_credit ? txn[:inputs].map {|input| input[:prev_out][:value] } : txn[:out].map {|out| out[:value] }
+      transaction[:values] = values.map {|value| get_bitcoin(value) }
 
-      entry = is_credit ? txn[:out].find { |out| out[:addr] == wallet_address } :
-                              txn[:inputs].find { |input| input[:prev_out][:addr] == wallet_address}
+      entry = txn[:out].find {|out| out[:addr] == wallet_address } if is_credit
+      entry = txn[:inputs].find {|input| input[:prev_out][:addr] == wallet_address } unless is_credit
+
       value = is_credit ? entry[:value] : entry[:prev_out][:value]
-      transaction[:amount] = "#{is_credit ? "+" : "-"}#{get_bitcoin(value)}"
+      transaction[:amount] = "#{is_credit ? '+' : '-'}#{get_bitcoin(value)}"
 
       transaction[:date] = Time.zone.at(txn[:time]).strftime("%d %b %Y %H:%M:%S")
 
@@ -63,6 +65,7 @@ class WalletInfoService < ApplicationService
     end
     transactions
   end
+  # rubocop:enable Metrics/AbcSize
 
   def server
     @_server ||= Excon.new("https://blockchain.info/")
