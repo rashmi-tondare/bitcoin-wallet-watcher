@@ -1,0 +1,24 @@
+@import "bootstrap-sprockets";
+@import "bootstrap";
+
+.jumbotron {
+  background-color: #021b3f;
+  color: #fff;
+  padding: 100px 25px;
+}
+
+th {
+  text-align: center;
+}
+
+.credit {
+  color: green;
+}
+
+.debit {
+  color: red;
+}
+
+.vertical-mid {
+  vertical-align: middle !important
+}

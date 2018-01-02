@@ -1,0 +1,46 @@
+<%= render template: "wallet_info/base" %>
+<div class="container-fluid text-center">
+  <% unless @result.nil? %>
+    <h2>Current Balance: <%= @result[:balance] %> BTC</h2>
+    <br>
+    <br>
+    <% unless @result.transactions.empty? %>
+      <table class="table">
+        <thead>
+          <th>Sender</th>
+          <th>Receiver</th>
+          <th>Transaction Values (in BTC)</th>
+          <th>Amount (in BTC)</th>
+          <th>Transaction Date</th>
+        </thead>
+        <tbody>
+          <% @result.transactions.each do |transaction| %>
+            <tr>
+                <td class="col-md-3">
+                  <% transaction[:senders].each do |sender| %>
+                    <%= link_to sender, wallet_info_path(address: sender), method: :get %>
+                  <% end %>
+                </td>
+                <td class="col-md-3">
+                  <% transaction[:receivers].each do |receiver| %>
+                    <%= link_to receiver, wallet_info_path(address: receiver), method: :get %>
+                  <% end %>
+                </td>
+                <td class="col-md-2">
+                  <% transaction[:values].each do |value| %>
+                    <%= value %> <br>
+                  <% end %>
+                </td>
+                <td class="col-md-2 vertical-mid <%= transaction[:amount].to_f > 0 ? "credit" : "debit" %>">
+                  <%= transaction[:amount] %>
+                </td>
+                <td class="col-md-2 vertical-mid"><%= transaction[:date] %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <p class="warning">No Transactions found!</p>
+    <% end %>
+  <% end %>
+</div>
